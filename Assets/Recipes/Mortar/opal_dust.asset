@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d96ee1e12e576c43a5ff5496932792d, type: 3}
+  m_Name: opal_dust
+  m_EditorClassIdentifier: 
+  inputs:
+  - {fileID: 11400000, guid: 5a8cbb4115ec80a42bdc8791b96a9525, type: 2}
+  outputs:
+  - {fileID: 11400000, guid: 2a7c0d772894ada4c8a96d00fbcc2d24, type: 2}
