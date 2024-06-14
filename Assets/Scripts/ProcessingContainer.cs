@@ -52,13 +52,16 @@ public abstract class ProcessingContainer : IngredientContainer, IInteractable {
         return true;
     }
 
-    public override void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public override void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (heldObject == null) return;
         IInteractable interactableObject = heldObject.GetComponent<IInteractable>();
         IngredientContainer ingredientBottle = heldObject.GetComponent<IngredientContainer>();
-        if (ingredientBottle) {
-            if (ingredientBottle.Full && !Full && CanAccept(ingredientBottle.GetIngredientType())) Fill(ingredientBottle.Empty());
-            if (!ingredientBottle.Full && SemiFull && ingredientBottle.CanAccept(GetIngredientType())) ingredientBottle.Fill(Empty());
+        if (ingredientBottle)
+        {
+            if (ingredientBottle.Full && !Full && CanAccept(ingredientBottle.GetIngredientType()))
+                Fill(ingredientBottle.Empty());
+            if (!ingredientBottle.Full && SemiFull && ingredientBottle.CanAccept(GetIngredientType()))
+                ingredientBottle.Fill(Empty());
         }
     }
 

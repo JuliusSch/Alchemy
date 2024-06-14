@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour, ISaveable {
 
@@ -18,6 +16,8 @@ public class PlayerMovement : MonoBehaviour, ISaveable {
     public LayerMask groundMask;
 
     void Update() {
+        if (PauseMenu.IsPaused) return;
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0) velocity.y = -2f;

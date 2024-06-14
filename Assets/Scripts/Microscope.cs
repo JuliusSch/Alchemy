@@ -6,7 +6,7 @@ public class Microscope : MonoBehaviour, IInteractable {
 
     IngredientSO sampledIngredient;
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (sampledIngredient) sampledIngredient = null;
         else {
             if (heldObject == null) return;

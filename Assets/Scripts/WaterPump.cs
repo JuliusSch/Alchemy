@@ -6,7 +6,7 @@ public class WaterPump : MonoBehaviour, IInteractable {
 
     [SerializeField] private IngredientSO waterIngredient;
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         IInteractable interactableObject = heldObject.GetComponent<IInteractable>();
         Debug.Log("so far");
         IngredientContainer waterBottle = heldObject.GetComponent<IngredientContainer>();

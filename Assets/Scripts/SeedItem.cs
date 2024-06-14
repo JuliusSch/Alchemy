@@ -9,7 +9,7 @@ public class SeedItem : MonoBehaviour, IInteractable {
         group = GameObject.Find("Seeds");
     }
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (heldObject == null) pickUpScript.PickUpObject(gameObject, this);
     }
 

@@ -10,7 +10,7 @@ public class SeedBox : MonoBehaviour, IInteractable {
     private float timer = 0f, growthProgress;
     private GameObject plantModel;
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (heldObject == null) return;
         SeedItem seedBag = heldObject.GetComponent<SeedItem>();
         if (seedBag && !hasSeed) {

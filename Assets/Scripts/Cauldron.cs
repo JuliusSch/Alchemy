@@ -1,30 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using DG.Tweening;
+using System.Collections.Generic;
+using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class Cauldron : ProcessingContainer {
 
-    private bool hasBaseFluid;
+    private bool hasBaseFluid, _isPouring;
     private const int MIN_VAL = 0, MAX_VAL = 7;
     [SerializeField, Range(MIN_VAL, MAX_VAL)] private int[] baseAspectValues = new int[IngredientSO.NUMBER_OF_ASPECTS];  //visible for testing only
     [SerializeField] private GameObject[] aspectValueBars = new GameObject[IngredientSO.NUMBER_OF_ASPECTS];
     [SerializeField] private List<ConcoctionSO> concoctionRecipes;
     [SerializeField] private GameObject liquidModel;
     [SerializeField] private PlayerDataManager dataManager;
+    [SerializeField] private Transform _pourPosition;
+    public AudioSource BubblingSound, SplashSound;
 
     public override bool Fill(IngredientSO newIng) {
         if (ingredients.Count >= maxIngredientCount) return false;
         if (newIng.type == IngredientSO.IngredientType.BASE_FLUID) hasBaseFluid = true;
+        if (hasBaseFluid && !BubblingSound.isPlaying) BubblingSound.Play();
         LoadFromSO(newIng);
         updateAspectValues(newIng);
-        updateDisplay();
+        SplashSound.Play();
+        //updateDisplay();
         return true;
     }
 
     public override void Update() {
         Full = !(ingredients.Count < maxIngredientCount);
         SemiFull = ingredients.Count > 0;
-        if (hasBaseFluid) liquidModel.SetActive(true);
-        else liquidModel.SetActive(false);
+        if (hasBaseFluid && !liquidModel.activeInHierarchy) liquidModel.SetActive(true);
+        else if (!hasBaseFluid && liquidModel.activeInHierarchy) liquidModel.SetActive(false);
     }
 
     public override bool CanAccept(IngredientSO.IngredientType type) {
@@ -51,36 +57,48 @@ public class Cauldron : ProcessingContainer {
         }
     }
 
-    public override void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
-        base.PrimaryInteraction(heldObject, pickUpScript);
-        if (heldObject == null) return;
-        ConcoctionContainer concoctionBottle = heldObject.GetComponent<ConcoctionContainer>();
-        if (concoctionBottle) {
-            ConcoctionSO concoction = findConcoction();
-            if (concoction && !concoctionBottle.filled) {
-                concoctionBottle.fill(concoction);
-                emptyCauldron();
-                dataManager.addConcoction(concoction);
-            }
-        }
+    public override void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
+        if (heldObject == null || _isPouring)
+            return;
+
+        _isPouring = true;
+        var position = heldObject.localPosition;
+        var rotation = heldObject.localEulerAngles;
+        heldObject.DORotate(_pourPosition.rotation.eulerAngles.Add(y: -90), .4f);
+        heldObject.DOMove(_pourPosition.position, .4f).onComplete = () => {
+            base.PrimaryInteraction(heldObject, pickUpScript);
+            heldObject.DOLocalMove(position, .4f).onComplete = () => _isPouring = false;
+            heldObject.DOLocalRotate(rotation, .4f);
+        };
+//        ConcoctionContainer concoctionBottle = heldObject.GetComponent<ConcoctionContainer>();
+//        if (concoctionBottle) {
+//            ConcoctionSO concoction = findConcoction();
+//;            if (concoction && !concoctionBottle.filled) {
+//                concoctionBottle.fill(concoction);
+//                emptyCauldron();
+//                dataManager.addConcoction(concoction);
+//            }
+//        }
     }
 
-    private void emptyCauldron() {
+    public void EmptyCauldron(ConcoctionSO concoction) {
         Full = false;
         SemiFull = false;
         hasBaseFluid = false;
+        BubblingSound.Stop();
         for (int i = 0; i < IngredientSO.NUMBER_OF_ASPECTS; i++) {
             baseAspectValues[i] = 0;
         }
-        updateDisplay();
+        dataManager.addConcoction(concoction);
+        //updateDisplay();
     }
 
     protected override void craft() {
-        ConcoctionSO concoction = findConcoction();
+        ConcoctionSO concoction = FindConcoction();
         if (concoction) { } // do
         }
 
-    protected ConcoctionSO findConcoction() {
+    public ConcoctionSO FindConcoction() {
         foreach (ConcoctionSO concoction in concoctionRecipes) {
             if (getIntArrayAsString(baseAspectValues).Equals(getIntArrayAsString(concoction.recipe))) return concoction;
         }

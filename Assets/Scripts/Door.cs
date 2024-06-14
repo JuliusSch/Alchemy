@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Door : MonoBehaviour, IInteractable {
@@ -17,7 +16,7 @@ public class Door : MonoBehaviour, IInteractable {
         openPos = Quaternion.AngleAxis(angle, vectorAround);
     }
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         //do nothing
     }
 

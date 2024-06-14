@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Basket : MonoBehaviour, IInteractable
 {
-    private Coroutine current;
-    private Rigidbody currentSettler;
     private List<Rigidbody> itemsContained;
     private bool held = false;
 
@@ -17,7 +15,7 @@ public class Basket : MonoBehaviour, IInteractable
         itemsContained = new List<Rigidbody>();
     }
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript)
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript)
     {
         if (heldObject == null)
         {
@@ -27,11 +25,7 @@ public class Basket : MonoBehaviour, IInteractable
             pickUpScript.PickUpObject(gameObject, this, true);
         } else
         {
-            //foreach (var item in itemsContained)
-            //    Unsettle(item);
-
-            pickUpScript.DropHeld();
-            //held = false;
+            pickUpScript.PlaceHeld();
         }
     }
 
@@ -47,8 +41,8 @@ public class Basket : MonoBehaviour, IInteractable
     {
         if (held)
             return;
-        IInteractable item;
-        if ((item = other.GetComponent<IInteractable>()) != null && !BodyParts.Contains(other.gameObject))
+        IInteractable item = other.GetComponentInParent<IInteractable>();
+        if (item != null && (item is IngredientContainer || item is ConcoctionContainer || item is SeedItem) && !BodyParts.Contains(other.gameObject))
             itemsContained.Add(item.gameObject.GetComponent<Rigidbody>());
     }
 
@@ -57,45 +51,15 @@ public class Basket : MonoBehaviour, IInteractable
         if (held)
             return;
         Rigidbody item;
-        if ((item = other.GetComponent<Rigidbody>()) != null && !BodyParts.Contains(other.gameObject))
+        if ((item = other.GetComponentInParent<Rigidbody>()) != null && !BodyParts.Contains(other.gameObject))
             itemsContained.Remove(item.GetComponent<Rigidbody>());
     }
 
-    //private void PutObjectInBasket(Transform obj, PickUp pickUpScript)
-    //{
-    //    pickUpScript.DropHeld();
-    //    CheckIfSettled();
-    //    currentSettler = obj.GetComponent<Rigidbody>();
-    //    current = StartCoroutine(InanimateWhenSettled());
-    //}
-
-    //private void CheckContents()
-    //{
-    //    foreach (var item in itemsContained)
-    //    {
-    //        item.gameObject.GetComponent<Rigidbody>();
-    //    }
-    //}
-
-    //private void CheckIfSettled()
-    //{
-    //    if (current != null)
-    //    {
-    //        StopCoroutine(current);
-    //        Settle(currentSettler);
-    //        current = null;
-    //        currentSettler = null;
-    //    }
-    //}
-
     private void Settle(Rigidbody rb)
     {
-        //if (GetComponent<BoxCollider>().Contains(currentSettler.transform.position))
-        //{
-            rb.transform.parent = transform;
-            rb.useGravity = false;
-            rb.isKinematic = true;
-        //}
+        rb.transform.parent = transform;
+        rb.useGravity = false;
+        rb.isKinematic = true;
     }
 
     private void Unsettle(Rigidbody rb)
@@ -104,20 +68,6 @@ public class Basket : MonoBehaviour, IInteractable
         rb.useGravity = true;
         rb.isKinematic = false;
     }
-
-    //private IEnumerator InanimateWhenSettled()
-    //{
-    //    float time = 0f;
-    //    while (time < 3 || currentSettler.velocity.magnitude > 0.01)
-    //    {
-    //        time += Time.deltaTime;
-    //        yield return null;
-    //    }
-    //    Settle(currentSettler);
-
-    //    current = null;
-    //    currentSettler = null;
-    //}
 
     public GameObject getGroup()
     {

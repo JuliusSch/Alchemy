@@ -9,7 +9,9 @@ public abstract class BookPage : MonoBehaviour {
     [SerializeField] protected GameObject pageNoField;
     [SerializeField] protected Sprite pageLeft, pageRight;
 
-    public abstract void fillContents();
+    public abstract void FillContents();
 
-    public abstract void fillIncompleteContents();
+    public abstract void FillIncompleteContents();
+
+    public abstract void Initialise();
 }

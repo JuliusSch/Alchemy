@@ -1,26 +1,29 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AlchemistBook : MonoBehaviour, ISaveable
 {
     [SerializeField] private BookPage[] pages;
-    [SerializeField] private Animator animator;
+    private PageAnimationManager _pageAnimationManager;
     private int activePageNoLeft;
 
-    private void Start() {
+    private void Start()
+    {
+        _pageAnimationManager = GetComponent<PageAnimationManager>();
         pages = FindObjectsOfType(typeof(BookPage)) as BookPage[];
+        foreach (BookPage page in pages)
+            page.Initialise();
+
         Array.Sort(pages, new PageSorter());
-        //activePageNoLeft = 0;
-        safeActivate(0, true);
-        //safeActivate(1, true);
+
+        SafeActivate(0, true);
         for (int i = 1; i < pages.Length; i++) {
-            safeActivate(i, false);
+            SafeActivate(i, false);
         }
     }
 
-    private void safeActivate(int i, bool val) {
+    private void SafeActivate(int i, bool val) {
         if (i >= 0 && i < pages.Length && pages[i])
             pages[i].gameObject.SetActive(val);
     }
@@ -32,31 +35,71 @@ public class AlchemistBook : MonoBehaviour, ISaveable
         }
     }
 
-    public bool FlipTo(int pageNo) {
+    public bool GoToPage(int pageNo, bool prev)
+    {
+        if (pageNo % 2 == 1)
+            return FlipTo(pageNo + 1, prev);
+        else
+            return FlipTo(pageNo, prev);
+    }
+
+    private bool FlipTo(int pageNo, bool prev) {
         if (pageNo < 0 || pageNo >= pages.Length + 1) {
             return false;
         }
-        safeActivate(activePageNoLeft - 1, false);
-        safeActivate(activePageNoLeft, false);
-        activePageNoLeft = pageNo;
-        safeActivate(activePageNoLeft - 1, true);
-        safeActivate(activePageNoLeft, true);
-        //animator.Play("PageFlip");
+        var currentPage = activePageNoLeft;
+        if (prev)
+        {
+            _pageAnimationManager.AddLeftFlip();
+            CallAfterDelay.Create(.2f, () =>
+            {
+                SafeActivate(currentPage, false);
+                SafeActivate(pageNo, true);
+            });
+            SafeActivate(activePageNoLeft - 1, false);
+            activePageNoLeft = pageNo;
+            SafeActivate(activePageNoLeft - 1, true);
+        }
+        else
+        {
+            _pageAnimationManager.AddRightFlip();
+            CallAfterDelay.Create(.2f, () => {
+                SafeActivate(currentPage - 1, false);
+                SafeActivate(pageNo - 1, true);
+            });
+            SafeActivate(activePageNoLeft, false);
+            activePageNoLeft = pageNo;
+            SafeActivate(activePageNoLeft, true);
+        }
         return true;
     }
 
-    public void updateEntryComplete(ConcoctionSO concoction, bool complete) {
+    public void UpdateEntry(ConcoctionSO concoction, bool complete) {
         foreach (BookPage page in pages) {
-            if (page is ConcoctionPage && ((ConcoctionPage) page).concoction == concoction) {
-                if (complete) page.fillContents();
-                else page.fillIncompleteContents();
+            if (page is ConcoctionPage page1 && page1.concoction == concoction)
+            {
+                if (complete) page.FillContents();
+                else page.FillIncompleteContents();
             }
         }
     }
 
-    public bool PrevPage() => FlipTo(activePageNoLeft - 2);
+    public bool PreviousPage() => FlipTo(activePageNoLeft - 2, true);
 
-    public bool NextPage() => FlipTo(activePageNoLeft + 2);
+    public bool NextPage() => FlipTo(activePageNoLeft + 2, false);
+
+    public void PreviousPageAction() => PreviousPage();
+    public void NextPageAction() => NextPage();
+
+    public void HoverNextPage()
+    {
+
+    }
+
+    public void HoverPreviousPage()
+    {
+
+    }
 
     public void Save(SaveData data)
     {
@@ -65,7 +108,6 @@ public class AlchemistBook : MonoBehaviour, ISaveable
 
     public void Load(SaveData data)
     {
-        //activePageNoLeft = data.PageNoLeft;
-        FlipTo(data.PageNoLeft);
+        FlipTo(data.PageNoLeft, false);
     }
 }

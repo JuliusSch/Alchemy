@@ -10,7 +10,7 @@ public interface ICarryable {
 
 public interface IInteractable {
 
-    void PrimaryInteraction(Transform heldObject, PickUp pickUpScript);
+    void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript);
     bool Interact(string key);
 
     void MouseOver();
@@ -18,6 +18,13 @@ public interface IInteractable {
 
     GameObject gameObject { get; }
 
+}
+
+// needed or can use buttons?
+public interface IInteractableUI
+{
+    void Hover();
+    void Interact();
 }
 
 public interface ISaveable

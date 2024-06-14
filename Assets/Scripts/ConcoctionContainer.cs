@@ -61,7 +61,7 @@ public class ConcoctionContainer : MonoBehaviour, IInteractable {
         return true;
     }
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (heldObject == null) pickUpScript.PickUpObject(transform.gameObject, this);
     }
 

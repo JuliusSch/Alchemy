@@ -70,7 +70,7 @@ public abstract class IngredientContainer : MonoBehaviour, IInteractable {
         return IngredientSO.IngredientType.STANDARD;
     }
 
-    public virtual void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public virtual void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (heldObject == null) pickUpScript.PickUpObject(transform.gameObject, this);
     }
 

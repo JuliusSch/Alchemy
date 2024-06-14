@@ -43,7 +43,7 @@ public class ShopItemSlot : MonoBehaviour, IInteractable {
         //contents = Instantiate(seed.prefabModel, transform).GetComponent<IInteractable>();
     }
 
-    public void PrimaryInteraction(Transform heldObject, PickUp pickUpScript) {
+    public void PrimaryInteraction(Transform heldObject, ItemInteraction pickUpScript) {
         if (turtleScript.CanBuy(contents))
             turtleScript.Buy(this);
     }
